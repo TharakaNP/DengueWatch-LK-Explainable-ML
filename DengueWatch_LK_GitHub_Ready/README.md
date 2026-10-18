@@ -60,6 +60,12 @@ The notebook includes:
 
 ## Streamlit App
 
+## Live Application
+
+The deployed Streamlit application is available here:
+
+https://denguewatch-lk-explainable-ml-sov7nqxg475kxbbgkktgrzy.streamlit.app/
+
 The app allows the user to:
 
 - Select a Sri Lankan reporting area
