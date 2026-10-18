@@ -64,7 +64,9 @@ The notebook includes:
 
 The deployed Streamlit application is available here:
 
-https://denguewatch-lk-explainable-ml-sov7nqxg475kxbbgkktgrzy.streamlit.app/
+## Live Application
+
+https://denguewatch-lk-explainable-ml-sov7nqxq475kxbgkktqrzy.streamlit.app/
 
 The app allows the user to:
 
