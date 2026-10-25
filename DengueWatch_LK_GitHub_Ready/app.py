@@ -225,13 +225,30 @@ FEATURES = [
 
 districts = sorted(data["district"].dropna().unique())
 
+if "selected_reporting_area" not in st.session_state:
+    st.session_state["selected_reporting_area"] = districts[0]
+
+
+def remember_reporting_area(widget_key):
+    st.session_state["selected_reporting_area"] = st.session_state[widget_key]
+
+
+def reporting_area_selector(label, widget_key):
+    # Keep a non-widget value so selection survives pages without a selector.
+    st.session_state[widget_key] = st.session_state["selected_reporting_area"]
+    return st.selectbox(
+        label, districts, key=widget_key,
+        on_change=remember_reporting_area, args=(widget_key,),
+    )
+
+
 with st.sidebar:
     st.markdown("### DengueWatch LK")
     st.caption("Explainable dengue forecasting")
     st.divider()
     page = st.radio(
         "Navigation",
-        ["Forecast", "Weekly Trend", "Explainability", "Model Evaluation"],
+        ["Forecast", "Weekly Trend", "Why this forecast?", "Model Performance"],
         label_visibility="collapsed",
     )
     st.divider()
@@ -271,7 +288,7 @@ if page == "Forecast":
     control_col, content_col = st.columns([1, 2], gap="medium")
 
     with control_col:
-        district = st.selectbox("Select reporting area for prediction", districts)
+        district = reporting_area_selector("Select reporting area for prediction", "forecast_area")
         d = data[data["district"] == district].dropna(subset=FEATURES).sort_values("date").copy()
         if d.empty:
             st.warning("No usable records are available for this reporting area.")
@@ -297,6 +314,10 @@ if page == "Forecast":
     m2.metric("Current cases", f"{latest['cases']:.0f}")
     m3.metric("4-week average", f"{latest['rolling_mean_4']:.1f}")
     m4.metric("4-week change", f"{latest['trend_current_4']:+.0f}")
+    st.caption(
+        f"Next-week forecast: {prediction:.0f} cases | Current cases: {latest['cases']:.0f} "
+        f"| 4-week average: {latest['rolling_mean_4']:.1f}"
+    )
 
     st.markdown("### Recent weekly cases")
     recent = d.tail(12)[["date", "cases"]].set_index("date")
@@ -312,23 +333,28 @@ elif page == "Weekly Trend":
 
     selector_col, _ = st.columns([1, 2], gap="medium")
     with selector_col:
-        selected = st.selectbox("Reporting area", districts, key="trend")
+        selected = reporting_area_selector("Reporting area", "trend_area")
     trend = (
         data[data["district"] == selected]
         .sort_values("date")
         .tail(26)[["date", "cases"]]
         .set_index("date")
     )
+    trend_latest, trend_min, trend_max, trend_average = st.columns(4, gap="small")
+    trend_latest.metric("Latest cases", f"{trend['cases'].iloc[-1]:.0f}")
+    trend_min.metric("Recent minimum", f"{trend['cases'].min():.0f}")
+    trend_max.metric("Recent maximum", f"{trend['cases'].max():.0f}")
+    trend_average.metric("Recent average", f"{trend['cases'].mean():.1f}")
     st.line_chart(trend, height=460)
     st.caption("Recent weekly observations are shown for the selected reporting area.")
     st.caption("Most recent 26 weekly observations. The forecasting model also uses lagged cases, rolling averages and seasonal week features.")
 
-elif page == "Explainability":
-    st.markdown('<div class="section-head"><h2>Explainability</h2><div class="section-copy">Inspect which features pushed the latest local prediction upward or downward.</div></div>', unsafe_allow_html=True)
+elif page == "Why this forecast?":
+    st.markdown('<div class="section-head"><h2>Why this forecast?</h2><div class="section-copy">See which recent dengue and seasonal features influenced the latest model prediction.</div></div>', unsafe_allow_html=True)
 
     selector_col, _ = st.columns([1, 2], gap="medium")
     with selector_col:
-        selected = st.selectbox("Reporting area", districts, key="xai")
+        selected = reporting_area_selector("Reporting area", "explanation_area")
     dx = data[data["district"] == selected].dropna(subset=FEATURES).sort_values("date")
     latest_xai = dx.iloc[-1]
     X_one = pd.DataFrame([latest_xai[FEATURES].to_dict()])
@@ -339,6 +365,8 @@ elif page == "Explainability":
     summary3.metric("Latest week", f"{int(latest_xai['week'])}")
 
     st.markdown("### Local SHAP explanation")
+    explanation_forecast = max(0.0, float(model.predict(X_one)[0]))
+    st.caption(f"Next-week forecast: {explanation_forecast:.0f} cases for {selected}.")
     if st.button("Generate SHAP explanation", type="primary"):
         with st.spinner("Generating SHAP explanation..."):
             preprocessor = model.named_steps["preprocessor"]
@@ -367,7 +395,7 @@ elif page == "Explainability":
         st.info("Generate the explanation when you want to inspect the selected reporting area's latest prediction.")
 
 else:
-    st.markdown('<div class="section-head"><h2>Model evaluation</h2><div class="section-copy">Final 2025 test performance of Extra Trees compared with a simple last-week benchmark.</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-head"><h2>Model Performance</h2><div class="section-copy">Final 2025 test performance of Extra Trees compared with a simple last-week benchmark.</div></div>', unsafe_allow_html=True)
 
     extra = results[results["Method"].str.contains("Extra Trees", case=False)].iloc[0]
     bench = results[results["Method"].str.contains("benchmark", case=False)].iloc[0]
@@ -376,6 +404,7 @@ else:
     c1.metric("MAE", f"{extra['MAE']:.2f}", delta=f"{extra['MAE'] - bench['MAE']:+.2f} vs benchmark", delta_color="inverse")
     c2.metric("RMSE", f"{extra['RMSE']:.2f}", delta=f"{extra['RMSE'] - bench['RMSE']:+.2f} vs benchmark", delta_color="inverse")
     c3.metric("R²", f"{extra['R2']:.3f}", delta=f"{extra['R2'] - bench['R2']:+.3f} vs benchmark")
+    st.caption("MAE — lower is better · RMSE — lower is better · R² — higher is better")
 
     st.markdown("### Test results")
     display_results = results.copy()
