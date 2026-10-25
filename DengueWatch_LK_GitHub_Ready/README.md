@@ -1,98 +1,39 @@
-# DengueWatch LK
+# DengueWatch LK — Extra Trees Forecasting
 
-**Explainable Machine Learning for Next-Week Dengue Case Forecasting in Sri Lanka**
+MSc in AI assignment project for next-week dengue case forecasting in Sri Lanka.
 
-**Student No: 269161X**
+## Main algorithm
+**Extra Trees Regressor (Extremely Randomized Trees)** — selected as a non-deep-learning algorithm not covered in the module lectures.
 
-## Project
+## Project workflow
+- Public Sri Lankan weekly dengue data
+- Lag, rolling-average, trend and seasonal features
+- Chronological train/validation/test split
+- Extra Trees hyperparameter selection on validation data
+- Final evaluation on 2025 test data
+- SHAP and LIME explainability
+- Streamlit front-end for prediction and local SHAP explanation
 
-This project predicts the number of dengue cases expected in the next reporting week for Sri Lankan reporting areas.
+## Final 2025 test result
+- MAE: 8.37
+- RMSE: 16.15
+- R²: 0.927
 
-The project compares:
+Last-week benchmark: MAE **8.77**, RMSE **15.79**, R² **0.930**.
 
-- Naive last-week baseline
-- Decision Tree Regressor
-- Random Forest Regressor
-- XGBoost Regressor
+## Live application
 
-The selected machine-learning model is explained using SHAP and LIME.
+[Open DengueWatch LK](https://denguewatch-lk-explainable-ml-sov7nqxq475kxbgkktqrzy.streamlit.app/)
 
-## Dataset
+## Run locally
 
-The project uses weekly Sri Lankan dengue case counts by reporting area.
-
-Main fields in the original dataset:
-
-- `year`
-- `week`
-- `start.date`
-- `end.date`
-- `district`
-- `cases`
-
-The notebook creates lagged case features, rolling averages, recent trend features and seasonal features.
-
-## Train / Validation / Test
-
-- Training: up to 2022
-- Validation: 2023–2024
-- Test: 2025
-
-A chronological split is used because this is a forecasting problem.
-
-## Evaluation
-
-Models are compared using:
-
-- MAE
-- RMSE
-- R²
-
-The model is selected using the validation results.
-
-## Explainable AI
-
-The notebook includes:
-
-- SHAP global explanation
-- SHAP local explanation
-- LIME local explanation
-
-## Streamlit App
-
-## Live Application
-
-The deployed Streamlit application is available here:
-
-## Live Application
-
-https://denguewatch-lk-explainable-ml-sov7nqxq475kxbgkktqrzy.streamlit.app/
-
-The app allows the user to:
-
-- Select a Sri Lankan reporting area
-- View the next-week dengue case forecast
-- View recent dengue trends
-- View a local SHAP explanation
-- View model-comparison results
-
-## Run Locally
+From `DengueWatch_LK_GitHub_Ready`:
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Files
+For Streamlit Community Cloud, select `DengueWatch_LK_GitHub_Ready/app.py` as the main file.
 
-- `DengueWatch_LK_Explainable_ML_269161X.ipynb` - main notebook
-- `srilanka_weekly_data.csv` - original dataset
-- `best_model.joblib` - trained model
-- `dengue_features.csv` - engineered data used by the app
-- `model_results.csv` - model-comparison results
-- `app.py` - Streamlit application
-- `requirements.txt` - Python dependencies
-
-## Note
-
-This is an academic prototype and not an official dengue warning system.
+The application is an academic prototype and is not an official public-health warning system.
