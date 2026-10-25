@@ -18,17 +18,20 @@ st.markdown(
     """
     <style>
         :root {
-            --ink: #17212b;
-            --muted: #667684;
-            --line: #e4e9ed;
+            --ink: #173047;
+            --muted: #617587;
+            --line: #dce7eb;
             --panel: #ffffff;
-            --bg: #f5f7f9;
+            --bg: #f3f7fa;
             --accent: #0f766e;
             --accent-soft: #eaf6f4;
         }
 
         html, body, [class*="css"] { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-        .stApp { background: var(--bg); color: var(--ink); }
+        .stApp {
+            background: radial-gradient(ellipse at top right, #e2f3f1 0, transparent 55%), var(--bg);
+            color: var(--ink);
+        }
 
         /* Main canvas */
         .block-container {
@@ -39,7 +42,7 @@ st.markdown(
 
         /* Sidebar */
         [data-testid="stSidebar"] {
-            background: #ffffff;
+            background: linear-gradient(180deg, #edf7f6, #ffffff 65%);
             border-right: 1px solid var(--line);
         }
         [data-testid="stSidebar"] .block-container {
@@ -48,18 +51,22 @@ st.markdown(
         [data-testid="stSidebar"] h3 {
             font-size: 1.12rem;
             margin: 0 0 .15rem 0;
+            color: #0c5f5b;
         }
         [data-testid="stSidebar"] hr { margin: 1.2rem 0; }
         [data-testid="stSidebar"] div[role="radiogroup"] { gap: .25rem; }
         [data-testid="stSidebar"] div[role="radiogroup"] > label {
-            padding: .44rem .45rem;
-            border-radius: 8px;
+            padding: .65rem .7rem;
+            border-radius: 10px;
+            border-left: 3px solid transparent;
         }
         [data-testid="stSidebar"] div[role="radiogroup"] > label:hover { background: #f3f7f7; }
         [data-testid="stSidebar"] div[role="radiogroup"] > label:has(input:checked) {
-            background: var(--accent-soft);
-            color: var(--accent);
+            background: #d9eeea;
+            border-left-color: var(--accent);
+            color: #075c55;
         }
+        [data-testid="stSidebar"] div[role="radiogroup"] > label:has(input:checked) p { font-weight: 700; }
 
         /* Typography */
         h1, h2, h3, h4 { color: var(--ink); letter-spacing: -0.025em; }
@@ -72,12 +79,18 @@ st.markdown(
             grid-template-columns: minmax(0, 1fr) minmax(100px, 18%);
             align-items: center;
             gap: 1.5rem;
-            padding-bottom: 1.4rem;
-            margin-bottom: .4rem;
-            border-bottom: 1px solid var(--line);
+            padding: 1.5rem 1.7rem;
+            margin-bottom: .6rem;
+            border: 1px solid #244c60;
+            border-radius: 18px;
+            background: radial-gradient(ellipse at 95% 0%, #216d75 0, transparent 60%), #142f44;
+            box-shadow: 0 8px 24px rgba(20, 47, 68, .08);
         }
         .header-visual { width: 100%; max-height: 145px; }
-        .dashboard-header h1 { padding: .35rem 0 0; }
+        .dashboard-header h1 { padding: .35rem 0 0; color: #ffffff; }
+        .dashboard-header .kicker { color: #83d6cc; }
+        .dashboard-header .subtitle { color: #d9e8ee; }
+        .dashboard-header .student-badge { color: #b7cdd8; }
         .kicker {
             color: var(--accent);
             font-size: .76rem;
@@ -97,7 +110,7 @@ st.markdown(
             margin: .55rem 0 0;
             max-width: 760px;
         }
-        .section-head { margin-bottom: .25rem; }
+        .section-head { margin: .35rem 0 .25rem; padding-left: .85rem; border-left: 3px solid #189b8f; }
         .section-head h2 { margin-bottom: .35rem !important; }
         .section-copy { color: var(--muted); font-size: .95rem; }
 
@@ -121,23 +134,36 @@ st.markdown(
             min-height: 44px !important;
         }
         [data-baseweb="select"] span { color: var(--ink) !important; }
+        [data-baseweb="select"] > div:focus-within {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, .1);
+        }
 
         /* Native metric cards */
         [data-testid="stMetric"] {
             background: var(--panel);
             border: 1px solid var(--line);
-            border-radius: 12px;
+            border-top: 3px solid #53b6aa;
+            border-radius: 14px;
             padding: 1rem 1.05rem;
             min-height: 148px;
-            box-shadow: 0 1px 2px rgba(15, 23, 42, .025);
+            box-shadow: 0 3px 12px rgba(23, 48, 71, .035);
         }
+        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:first-child [data-testid="stMetric"] {
+            background: linear-gradient(135deg, #e3f5ef, #f8fcfb);
+            border-color: #c8e5de;
+            border-top-color: #0f766e;
+        }
+        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(2) [data-testid="stMetric"] { border-top-color: #4b8ba8; }
+        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(3) [data-testid="stMetric"] { border-top-color: #798cb2; }
+        [data-testid="stHorizontalBlock"] > [data-testid="stColumn"]:nth-child(4) [data-testid="stMetric"] { border-top-color: #5c9c98; }
         [data-testid="stMetricLabel"] { min-height: 2.6rem; align-items: flex-start; }
         [data-testid="stMetricLabel"] p { color: var(--muted) !important; font-weight: 650; line-height: 1.3; }
         [data-testid="stMetricValue"] { color: var(--ink) !important; font-size: clamp(1.55rem, 2.4vw, 2rem); font-variant-numeric: tabular-nums; }
 
         /* Custom cards */
         .info-card {
-            background: #fff;
+            background: linear-gradient(120deg, #ffffff, #eef7f8);
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 1rem 1.05rem;
@@ -147,6 +173,7 @@ st.markdown(
         .soft-note {
             background: #eef8f6;
             border: 1px solid #d5ece8;
+            border-left: 3px solid #339f92;
             border-radius: 10px;
             padding: .95rem 1rem;
             color: #334155;
@@ -158,8 +185,9 @@ st.markdown(
         [data-testid="stVegaLiteChart"], [data-testid="stArrowVegaLiteChart"] {
             background: var(--panel);
             border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: .6rem;
+            border-radius: 14px;
+            padding: .85rem;
+            box-shadow: 0 3px 12px rgba(23, 48, 71, .025);
         }
 
         /* Tables */
@@ -182,6 +210,13 @@ st.markdown(
             border-radius: 9px;
             font-weight: 650;
         }
+        .stButton > button[kind="primary"] {
+            background: #0f766e;
+            border-color: #0f766e;
+            box-shadow: 0 3px 8px rgba(15, 118, 110, .13);
+        }
+        .stButton > button[kind="primary"]:hover { background: #0b625b; border-color: #0b625b; }
+        .stButton > button:focus-visible { outline: 2px solid #0f766e; outline-offset: 3px; }
 
         @media (max-width: 900px) {
             .block-container { padding-left: 1.25rem; padding-right: 1.25rem; }
@@ -189,7 +224,7 @@ st.markdown(
         }
         @media (max-width: 640px) {
             .block-container { padding: 1.5rem 1rem; }
-            .dashboard-header { gap: .75rem; grid-template-columns: minmax(0, 1fr) 18%; }
+            .dashboard-header { padding: 1.15rem; gap: .75rem; grid-template-columns: minmax(0, 1fr) 18%; }
             h1 { font-size: 1.85rem !important; }
             .subtitle { font-size: .9rem; }
             .header-visual { min-width: 0; }
@@ -269,12 +304,23 @@ st.markdown(
         <div class="student-badge">MSc in AI · Student No. 269161X</div>
       </div>
       <svg class="header-visual" viewBox="0 0 190 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Stylized Sri Lanka silhouette with a health analytics chart">
-        <rect x="8" y="12" width="174" height="126" rx="22" fill="#eaf6f4"/>
+        <defs>
+          <linearGradient id="map-panel" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f3fcfa"/><stop offset="1" stop-color="#c9eae4"/>
+          </linearGradient>
+        </defs>
+        <rect x="8" y="12" width="174" height="126" rx="22" fill="url(#map-panel)"/>
+        <circle cx="66" cy="77" r="48" fill="none" stroke="#0f766e" stroke-opacity=".1"/>
+        <circle cx="66" cy="77" r="35" fill="none" stroke="#0f766e" stroke-opacity=".12"/>
         <path d="M65 24 C62 31 65 37 61 43 L53 53 C52 62 45 67 44 77 C40 89 43 106 51 118 C58 129 69 129 78 122 C89 115 91 102 87 91 C83 77 75 66 72 53 C69 42 71 33 65 24Z" fill="#0f766e"/>
         <rect x="91" y="51" width="78" height="64" rx="9" fill="white" stroke="#b9dcd6"/>
+        <path d="M102 76 H158 M102 88 H158" stroke="#e4efef" stroke-width="1"/>
+        <path d="M106 91 L118 84 L130 88 L143 70 L155 75 V102 H106Z" fill="#e0f4ef"/>
         <path d="M102 64 V102 H158" fill="none" stroke="#17212b" stroke-opacity=".45" stroke-width="2"/>
         <path d="M106 91 L118 84 L130 88 L143 70 L155 75" fill="none" stroke="#0f766e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         <circle cx="143" cy="70" r="3" fill="#17212b"/>
+        <circle cx="106" cy="91" r="2.5" fill="#0f766e"/>
+        <circle cx="155" cy="75" r="2.5" fill="#0f766e"/>
         <path d="M146 25 V39 M139 32 H153" stroke="#0f766e" stroke-width="3" stroke-linecap="round"/>
       </svg>
     </div>
@@ -321,7 +367,7 @@ if page == "Forecast":
 
     st.markdown("### Recent weekly cases")
     recent = d.tail(12)[["date", "cases"]].set_index("date")
-    st.line_chart(recent, height=300)
+    st.line_chart(recent, height=300, color="#0d9488")
 
     st.markdown(
         '<div class="soft-note"><strong>Academic prototype:</strong> this dashboard is for coursework and demonstration only. It is not an official dengue warning or public-health decision system.</div>',
@@ -345,7 +391,7 @@ elif page == "Weekly Trend":
     trend_min.metric("Recent minimum", f"{trend['cases'].min():.0f}")
     trend_max.metric("Recent maximum", f"{trend['cases'].max():.0f}")
     trend_average.metric("Recent average", f"{trend['cases'].mean():.1f}")
-    st.line_chart(trend, height=460)
+    st.line_chart(trend, height=460, color="#0d9488")
     st.caption("Recent weekly observations are shown for the selected reporting area.")
     st.caption("Most recent 26 weekly observations. The forecasting model also uses lagged cases, rolling averages and seasonal week features.")
 
